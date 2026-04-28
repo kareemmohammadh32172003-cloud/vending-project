@@ -1,0 +1,9 @@
+Flask
+mysql-connector-python
+python-dotenv
+pytesseract
+opencv-python
+numpy
+Pillow
+qrcode
+twilio

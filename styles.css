@@ -1,0 +1,81 @@
+/* ===== Global Styling ===== */
+body {
+    font-family: "Poppins", Arial, sans-serif;
+    background: #eef2f3;
+    margin: 0;
+    padding: 40px 0;
+}
+
+/* ===== Container ===== */
+.container {
+    width: 420px;
+    margin: auto;
+    background: #ffffff;
+    padding: 25px 30px;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+/* ===== Titles ===== */
+h2, h3 {
+    text-align: center;
+    color: #333;
+    font-weight: 600;
+}
+
+/* ===== Inputs & Dropdown ===== */
+input, select {
+    width: 100%;
+    padding: 12px;
+    margin-top: 8px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+    transition: 0.2s;
+}
+
+input:focus, select:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 6px rgba(0,123,255,0.4);
+}
+
+/* ===== Buttons ===== */
+button {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #007bff, #0056d6);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.25s;
+}
+
+button:hover {
+    transform: scale(1.03);
+    background: linear-gradient(135deg, #0056d6, #003f9e);
+}
+
+/* ===== Hidden elements ===== */
+.hidden {
+    display: none;
+}
+
+/* ===== Order Info Box ===== */
+#orderInfo {
+    margin-top: 15px;
+    padding: 12px;
+    background: #f8f9ff;
+    border-left: 4px solid #0056d6;
+    border-radius: 8px;
+}
+
+#result {
+    margin-top: 12px;
+    font-size: 15px;
+    text-align: center;
+}

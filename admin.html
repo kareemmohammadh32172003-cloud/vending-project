@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Smart Vending — Professional Admin Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#050b14;--bg2:#08111f;--card:#0d1829;--card2:#111f35;--line:rgba(14,165,233,.14);
+      --blue:#0ea5e9;--cyan:#22d3ee;--green:#00e5a0;--red:#ff4d6d;--yellow:#fbbf24;
+      --text:#e8f4ff;--muted:#7d9aae;--soft:rgba(255,255,255,.04);--radius:18px;
+      --mono:'Space Mono',monospace;--font:'Tajawal',sans-serif;
+    }
+    *{box-sizing:border-box;margin:0;padding:0} html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var(--text)}
+    body:before{content:"";position:fixed;inset:0;background:radial-gradient(circle at 20% 8%,rgba(14,165,233,.16),transparent 32%),radial-gradient(circle at 88% 70%,rgba(0,229,160,.12),transparent 34%),linear-gradient(135deg,#050b14,#08111f);z-index:-2}
+    body:after{content:"";position:fixed;inset:0;background-image:linear-gradient(rgba(14,165,233,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(14,165,233,.04) 1px,transparent 1px);background-size:36px 36px;z-index:-1;mask-image:linear-gradient(to bottom,black,transparent 92%)}
+    .wrap{max-width:1240px;margin:auto;padding:24px 18px 50px}.top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:22px;padding-bottom:18px;border-bottom:1px solid var(--line)}
+    .brand{display:flex;align-items:center;gap:14px}.brand-icon{width:54px;height:54px;border-radius:17px;background:linear-gradient(135deg,var(--blue),var(--green));display:grid;place-items:center;font-size:27px;box-shadow:0 0 32px rgba(14,165,233,.28)}
+    h1{font-size:25px;font-weight:900;letter-spacing:-.5px}.sub{font-family:var(--mono);font-size:12px;color:var(--blue);letter-spacing:1.3px}.actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.live{display:flex;align-items:center;gap:8px;border:1px solid rgba(0,229,160,.25);background:rgba(0,229,160,.08);color:var(--green);border-radius:999px;padding:9px 14px;font-family:var(--mono);font-size:12px}.dot{width:8px;height:8px;background:var(--green);border-radius:50%;animation:pulse 1.4s infinite}@keyframes pulse{50%{opacity:.35;transform:scale(.75)}}
+    .btn{border:0;border-radius:12px;padding:11px 16px;font-weight:800;font-family:var(--font);cursor:pointer;transition:.15s;display:inline-flex;align-items:center;justify-content:center;gap:8px}.btn:active{transform:scale(.97)}.btn-primary{background:linear-gradient(135deg,var(--blue),#0369a1);color:white;box-shadow:0 8px 24px rgba(14,165,233,.24)}.btn-green{background:linear-gradient(135deg,var(--green),#00b889);color:#001a10}.btn-red{background:linear-gradient(135deg,var(--red),#c9184a);color:white}.btn-ghost{background:var(--card2);color:var(--text);border:1px solid var(--line)}
+    .settings{display:grid;grid-template-columns:1fr auto;gap:10px;margin-bottom:20px}.settings input{background:var(--card);border:1px solid var(--line);border-radius:12px;color:var(--text);padding:12px 14px;font-family:var(--mono);outline:0}.settings input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(14,165,233,.1)}
+    .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:20px}.stat{background:rgba(13,24,41,.9);border:1px solid var(--line);border-radius:var(--radius);padding:17px;position:relative;overflow:hidden}.stat:before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--blue),var(--green))}.stat-label{font-size:12px;color:var(--muted);font-family:var(--mono);letter-spacing:.7px}.stat-value{font-size:30px;font-weight:900;margin-top:6px}.stat-note{font-size:12px;color:var(--muted);margin-top:2px}
+    .layout{display:grid;grid-template-columns:1.45fr .75fr;gap:18px}.panel{background:rgba(13,24,41,.92);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}.panel-head{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px}.panel-title{font-weight:900;color:var(--text)}.panel-title span{color:var(--blue);font-family:var(--mono);font-size:12px;margin-right:8px}.tools{display:flex;gap:8px;align-items:center}.tools input,.tools select{background:var(--card2);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:9px 10px;outline:0;font-family:var(--font)}
+    .list{padding:14px;display:flex;flex-direction:column;gap:14px}.payment{border:1px solid var(--line);background:var(--card2);border-radius:16px;overflow:hidden;animation:fade .25s ease}.payment-top{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:13px 15px;border-bottom:1px solid var(--line)}.order{font-family:var(--mono);font-size:12px;color:var(--cyan);word-break:break-all}.tag{font-family:var(--mono);font-size:11px;border-radius:999px;padding:5px 10px;background:rgba(251,191,36,.1);color:var(--yellow);border:1px solid rgba(251,191,36,.2)}
+    .payment-body{display:grid;grid-template-columns:150px 1fr;gap:14px;padding:15px}.thumb{width:150px;height:190px;object-fit:cover;border-radius:12px;border:1px solid var(--line);background:#020617}.no-img{width:150px;height:190px;display:grid;place-items:center;border:1px dashed var(--line);border-radius:12px;color:var(--muted);background:#07101d}.meta{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:12px}.m{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);border-radius:12px;padding:10px}.ml{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.8px}.mv{font-weight:800;margin-top:4px}.money{color:var(--green);font-family:var(--mono)}.ocr{background:#03080f;border:1px solid rgba(14,165,233,.09);border-radius:12px;padding:11px;font-family:var(--mono);font-size:11px;color:#8bdcff;max-height:78px;overflow:auto;white-space:pre-wrap;line-height:1.55}.row-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}.small{font-size:12px;padding:8px 13px}.empty,.loading{padding:45px 16px;text-align:center;color:var(--muted)}.empty b{display:block;color:var(--text);font-size:18px;margin-bottom:6px}.spin{width:30px;height:30px;border:2px solid var(--line);border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 13px}@keyframes spin{to{transform:rotate(360deg)}}@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+    .side{display:flex;flex-direction:column;gap:18px}.activity{padding:14px}.act{display:flex;gap:10px;padding:12px;border-bottom:1px solid rgba(255,255,255,.05)}.act:last-child{border-bottom:0}.act-icon{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:rgba(14,165,233,.12)}.act-title{font-weight:800;font-size:13px}.act-sub{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:2px}.pin-grid{padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:10px}.pin-card{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:14px;text-align:center}.pin-card strong{display:block;font-size:26px}.pin-card span{font-size:12px;color:var(--muted)}.console{height:150px;background:#03080f;padding:14px;font-family:var(--mono);font-size:12px;color:#79d7ff;overflow:auto;white-space:pre-line;line-height:1.6}.danger-text{color:var(--red)}.ok-text{color:var(--green)}
+    @media(max-width:980px){.stats{grid-template-columns:repeat(2,1fr)}.layout{grid-template-columns:1fr}.payment-body{grid-template-columns:1fr}.thumb,.no-img{width:100%;height:220px}.meta{grid-template-columns:1fr 1fr}.top{align-items:flex-start;flex-direction:column}.settings{grid-template-columns:1fr}.actions{width:100%}.actions .btn{flex:1}}@media(max-width:560px){.stats,.meta{grid-template-columns:1fr}.tools{flex-direction:column;align-items:stretch}.tools input,.tools select{width:100%}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div class="brand"><div class="brand-icon">🛡️</div><div><h1>Smart Vending Admin</h1><div class="sub">CONTROL CENTER · LIVE OPERATIONS</div></div></div>
+      <div class="actions"><div class="live"><span class="dot"></span>LIVE</div><button class="btn btn-primary" id="refreshBtn">🔄 تحديث</button><button class="btn btn-ghost" id="autoBtn">⏱ Auto: ON</button></div>
+    </header>
+
+    <div class="settings"><input id="baseUrl" placeholder="Base URL مثال: http://192.168.1.9:5000"><button class="btn btn-ghost" id="saveBase">حفظ السيرفر</button></div>
+
+    <section class="stats">
+      <div class="stat"><div class="stat-label">PENDING</div><div class="stat-value" id="stPending">—</div><div class="stat-note">طلبات في انتظار المراجعة</div></div>
+      <div class="stat"><div class="stat-label">UPLOADED RECEIPTS</div><div class="stat-value" id="stReceipts">—</div><div class="stat-note">إيصالات مرفوعة</div></div>
+      <div class="stat"><div class="stat-label">PENDING REVENUE</div><div class="stat-value" id="stRevenue">—</div><div class="stat-note">EGP معلقة</div></div>
+      <div class="stat"><div class="stat-label">AVAILABLE PINS</div><div class="stat-value" id="stAvailablePins">—</div><div class="stat-note">PIN جاهز للاستخدام</div></div>
+      <div class="stat"><div class="stat-label">USED PINS</div><div class="stat-value" id="stUsedPins">—</div><div class="stat-note">PIN تم استخدامه</div></div>
+    </section>
+
+    <main class="layout">
+      <section class="panel">
+        <div class="panel-head"><div class="panel-title">المدفوعات المعلقة <span>PENDING PAYMENTS</span></div><div class="tools"><input id="searchBox" placeholder="بحث بالمنتج / الهاتف / Order"><select id="filterSelect"><option value="all">الكل</option><option value="withReceipt">بها إيصال</option><option value="withoutReceipt">بدون إيصال</option></select></div></div>
+        <div class="list" id="paymentsList"><div class="loading"><div class="spin"></div>جارٍ تحميل البيانات...</div></div>
+      </section>
+
+      <aside class="side">
+        <section class="panel"><div class="panel-head"><div class="panel-title">حالة الـ PINs <span>PINS</span></div></div><div class="pin-grid"><div class="pin-card"><strong id="pinAvailable2">—</strong><span>Available</span></div><div class="pin-card"><strong id="pinUsed2">—</strong><span>Used</span></div></div></section>
+        <section class="panel"><div class="panel-head"><div class="panel-title">آخر النشاطات <span>ACTIVITY</span></div></div><div class="activity" id="activityList"></div></section>
+        <section class="panel"><div class="panel-head"><div class="panel-title">System Log <span>CONSOLE</span></div></div><div class="console" id="log">// Dashboard initialized...</div></section>
+      </aside>
+    </main>
+  </div>
+
+<script>
+const baseKey='ADMIN_BASE_URL_vending';
+const defaultBase='http://127.0.0.1:5000';
+const el=id=>document.getElementById(id);
+let allRows=[];let pins=[];let autoRefresh=true;let timer=null;
+const baseInput=el('baseUrl');baseInput.value=localStorage.getItem(baseKey)||defaultBase;
+function base(){return (localStorage.getItem(baseKey)||defaultBase).replace(/\/$/,'')}
+function log(msg){const t=new Date().toLocaleTimeString();el('log').innerText=`[${t}] ${msg}\n`+el('log').innerText;}
+el('saveBase').onclick=()=>{if(!baseInput.value.trim())return alert('اكتب Base URL');localStorage.setItem(baseKey,baseInput.value.trim());log('Base URL saved: '+base());loadAll();};
+el('refreshBtn').onclick=loadAll;
+el('autoBtn').onclick=()=>{autoRefresh=!autoRefresh;el('autoBtn').innerText='⏱ Auto: '+(autoRefresh?'ON':'OFF');if(autoRefresh)startAuto();else clearInterval(timer)};
+el('searchBox').oninput=renderPayments;el('filterSelect').onchange=renderPayments;
+function startAuto(){clearInterval(timer);timer=setInterval(()=>{if(autoRefresh)loadAll(true)},10000)}
+async function fetchJson(path){const res=await fetch(base()+path);if(!res.ok)throw new Error(res.status+' '+await res.text());return await res.json()}
+async function loadAll(silent=false){if(!silent)el('paymentsList').innerHTML='<div class="loading"><div class="spin"></div>جارٍ تحميل البيانات...</div>';try{const [rows,pinRows]=await Promise.all([fetchJson('/admin/pending_payments'),fetchJson('/admin/pins').catch(()=>[])]);allRows=rows||[];pins=pinRows||[];updateStats();renderPayments();renderActivity();log('Loaded dashboard data: '+allRows.length+' pending');}catch(e){el('paymentsList').innerHTML=`<div class="empty"><b>تعذر الاتصال بالسيرفر</b><span>${e.message}</span></div>`;log('Error: '+e.message)}}
+function updateStats(){const receipts=allRows.filter(r=>r.img_path).length;const revenue=allRows.reduce((s,r)=>s+(parseFloat(r.amount)||0),0);const available=pins.filter(p=>!Number(p.used)).length;const used=pins.filter(p=>Number(p.used)).length;el('stPending').textContent=allRows.length;el('stReceipts').textContent=receipts;el('stRevenue').textContent=revenue.toFixed(0);el('stAvailablePins').textContent=available;el('stUsedPins').textContent=used;el('pinAvailable2').textContent=available;el('pinUsed2').textContent=used;}
+function imageUrl(path){if(!path)return '';const fn=String(path).split(/[/\\]/).pop();return base()+'/uploads/'+encodeURIComponent(fn)}
+function filteredRows(){const q=el('searchBox').value.trim().toLowerCase();const f=el('filterSelect').value;return allRows.filter(r=>{const hay=[r.order_id,r.product,r.customer_phone,r.ref_code,r.sender_phone].join(' ').toLowerCase();if(q&&!hay.includes(q))return false;if(f==='withReceipt'&&!r.img_path)return false;if(f==='withoutReceipt'&&r.img_path)return false;return true;});}
+function renderPayments(){const rows=filteredRows();if(rows.length===0){el('paymentsList').innerHTML='<div class="empty"><b>لا توجد طلبات مطابقة</b><span>جرّب تغيير البحث أو الفلتر</span></div>';return}el('paymentsList').innerHTML='';rows.forEach((r,i)=>{const img=imageUrl(r.img_path);const order=r.order_id||'—';const short=order.length>14?order.slice(0,14)+'...':order;const card=document.createElement('div');card.className='payment';card.style.animationDelay=(i*.03)+'s';card.innerHTML=`
+<div class="payment-top"><div class="order">${short}</div><div class="tag">${r.status||'PENDING'}</div></div>
+<div class="payment-body"><div>${img?`<img class="thumb" src="${img}" onerror="this.outerHTML='<div class=&quot;no-img&quot;>خطأ صورة</div>'">`:'<div class="no-img">📷 لا توجد صورة</div>'}${img?`<a class="btn btn-ghost small" style="margin-top:9px;width:100%;text-decoration:none" href="${img}" target="_blank">فتح الصورة</a>`:''}</div>
+<div><div class="meta"><div class="m"><div class="ml">PRODUCT</div><div class="mv">${r.product||'—'}</div></div><div class="m"><div class="ml">AMOUNT</div><div class="mv money">${r.amount||'—'} EGP</div></div><div class="m"><div class="ml">PHONE</div><div class="mv">${r.customer_phone||'—'}</div></div><div class="m"><div class="ml">OCR AMOUNT</div><div class="mv money">${r.ocr_amount||'—'}</div></div><div class="m"><div class="ml">REF CODE</div><div class="mv">${r.ref_code||'—'}</div></div><div class="m"><div class="ml">SENDER</div><div class="mv">${r.sender_phone||'—'}</div></div></div>
+<div class="ocr">${escapeHtml(r.raw_text||'— لا يوجد OCR text —')}</div><div class="row-actions"><button class="btn btn-green small" onclick="approveOrder('${order.replace(/'/g,"\\'")}')">✅ قبول وإصدار PIN</button><button class="btn btn-red small" onclick="rejectOrder('${order.replace(/'/g,"\\'")}')">❌ رفض</button><button class="btn btn-ghost small" onclick="copyText('${order.replace(/'/g,"\\'")}')">📋 نسخ Order</button></div></div></div>`;el('paymentsList').appendChild(card);});}
+function renderActivity(){const box=el('activityList');const rows=allRows.slice(0,5);if(rows.length===0){box.innerHTML='<div class="empty" style="padding:22px">لا يوجد نشاط حالي</div>';return}box.innerHTML=rows.map(r=>`<div class="act"><div class="act-icon">🧾</div><div><div class="act-title">${r.product||'طلب'} · ${r.amount||'—'} EGP</div><div class="act-sub">${(r.order_id||'').slice(0,18)}...</div></div></div>`).join('')}
+function escapeHtml(s){return String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
+async function approveOrder(orderId){if(!confirm('تأكيد قبول الطلب وإصدار PIN؟'))return;try{const res=await fetch(base()+'/admin/approve',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({order_id:orderId})});const data=await res.json();if(res.ok){alert('✅ تم القبول\nPIN: '+(data.pin||'—'));log('Approved '+orderId+' PIN '+(data.pin||''));loadAll();}else alert('فشل: '+(data.error||JSON.stringify(data)))}catch(e){alert('خطأ اتصال: '+e.message);log('Approve error: '+e.message)}}
+async function rejectOrder(orderId){const reason=prompt('سبب الرفض اختياري:','');if(reason===null)return;try{const res=await fetch(base()+'/admin/reject',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({order_id:orderId,reason})});const data=await res.json();if(res.ok){alert('تم الرفض');log('Rejected '+orderId);loadAll();}else alert('فشل: '+(data.error||JSON.stringify(data)))}catch(e){alert('خطأ اتصال: '+e.message);log('Reject error: '+e.message)}}
+function copyText(t){navigator.clipboard?.writeText(t);log('Copied order id');}
+loadAll();startAuto();
+</script>
+</body>
+</html>

@@ -1,0 +1,839 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Smart Vending Machine</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #060d1a;
+      --surface: #0d1829;
+      --surface2: #111f35;
+      --border: rgba(0,200,150,0.12);
+      --primary: #00e5a0;
+      --primary-dim: rgba(0,229,160,0.15);
+      --primary-glow: rgba(0,229,160,0.4);
+      --blue: #0ea5e9;
+      --blue-dim: rgba(14,165,233,0.12);
+      --text: #e8f4f0;
+      --muted: #6b8fa0;
+      --danger: #ff4d6d;
+      --warning: #fbbf24;
+      --radius: 16px;
+      --mono: 'Space Mono', monospace;
+      --arabic: 'Tajawal', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--arabic);
+      font-size: 15px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 80% 10%, rgba(0,229,160,0.07) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 60% at 10% 80%, rgba(14,165,233,0.06) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Grid dot pattern */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(circle, rgba(0,229,160,0.06) 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 28px 20px 48px;
+    }
+
+    /* ─── HEADER ─── */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 36px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo-icon {
+      width: 48px; height: 48px;
+      background: linear-gradient(135deg, var(--primary), #00b8a9);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 0 20px var(--primary-glow);
+    }
+
+    .logo-text h1 {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.3px;
+    }
+
+    .logo-text span {
+      font-size: 12px;
+      color: var(--primary);
+      font-family: var(--mono);
+      letter-spacing: 1px;
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--primary-dim);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 8px 16px;
+      font-size: 13px;
+      color: var(--primary);
+      font-family: var(--mono);
+    }
+
+    .status-dot {
+      width: 8px; height: 8px;
+      background: var(--primary);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    /* ─── MAIN GRID ─── */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 20px;
+      align-items: start;
+    }
+
+    @media(max-width: 900px) {
+      .main-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ─── CARD ─── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--primary), transparent);
+      opacity: 0.5;
+    }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--primary);
+      font-family: var(--mono);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title::before {
+      content: '';
+      width: 3px;
+      height: 14px;
+      background: var(--primary);
+      border-radius: 2px;
+      box-shadow: 0 0 8px var(--primary);
+    }
+
+    /* ─── PRODUCTS GRID ─── */
+    .products-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .product-card {
+      background: var(--surface2);
+      border: 2px solid transparent;
+      border-radius: 14px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .product-card:hover {
+      border-color: rgba(0,229,160,0.3);
+      transform: translateY(-2px);
+    }
+
+    .product-card.selected {
+      border-color: var(--primary);
+      background: var(--primary-dim);
+      box-shadow: 0 0 20px rgba(0,229,160,0.1);
+    }
+
+    .product-card.selected::after {
+      content: '✓';
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      width: 22px;
+      height: 22px;
+      background: var(--primary);
+      color: #000;
+      border-radius: 50%;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .product-emoji { font-size: 28px; margin-bottom: 8px; display: block; }
+    .product-name { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .product-price {
+      font-size: 13px;
+      font-family: var(--mono);
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    /* ─── FORM FIELDS ─── */
+    .field { margin-bottom: 18px; }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      font-family: var(--mono);
+    }
+
+    input[type=text], input[type=file], select, #baseUrlInput {
+      width: 100%;
+      padding: 12px 16px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 15px;
+      font-family: var(--arabic);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input[type=text]:focus, select:focus, #baseUrlInput:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0,229,160,0.1);
+    }
+
+    select option { background: var(--surface2); }
+
+    /* hide default file input */
+    input[type=file] { display: none; }
+
+    .file-upload-zone {
+      width: 100%;
+      padding: 20px;
+      background: var(--surface2);
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .file-upload-zone:hover, .file-upload-zone.has-file {
+      border-color: var(--primary);
+      background: var(--primary-dim);
+      color: var(--primary);
+    }
+
+    .file-upload-zone .upload-icon { font-size: 28px; margin-bottom: 8px; display: block; }
+
+    /* ─── BUTTONS ─── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 20px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-weight: 700;
+      font-family: var(--arabic);
+      font-size: 14px;
+      transition: all 0.15s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0);
+      transition: background 0.1s;
+    }
+
+    .btn:hover::after { background: rgba(255,255,255,0.06); }
+    .btn:active { transform: scale(0.98); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary) 0%, #00c48c 100%);
+      color: #001a10;
+      box-shadow: 0 4px 16px rgba(0,229,160,0.3);
+    }
+
+    .btn-primary:hover { box-shadow: 0 6px 24px rgba(0,229,160,0.45); }
+
+    .btn-blue {
+      background: linear-gradient(135deg, var(--blue) 0%, #0077cc 100%);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(14,165,233,0.3);
+    }
+
+    .btn-ghost {
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      box-shadow: none;
+    }
+
+    .btn-ghost:hover { border-color: var(--primary); color: var(--primary); }
+
+    .btn-full { width: 100%; }
+
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    /* ─── ORDER STATUS AREA ─── */
+    .order-status {
+      padding: 14px 16px;
+      border-radius: 12px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      font-size: 14px;
+      color: var(--muted);
+      min-height: 52px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.3s;
+    }
+
+    .order-status.active {
+      background: rgba(0,229,160,0.08);
+      border-color: rgba(0,229,160,0.3);
+      color: var(--primary);
+    }
+
+    .order-status.active .status-icon { color: var(--primary); }
+
+    /* ─── RIGHT PANEL ─── */
+    .qr-panel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 200px;
+      background: var(--surface2);
+      border-radius: 14px;
+      border: 1px dashed rgba(0,229,160,0.2);
+      padding: 24px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+
+    .qr-panel .qr-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.4; }
+    .qr-link {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--blue);
+      word-break: break-all;
+      margin-top: 10px;
+      padding: 10px;
+      background: var(--blue-dim);
+      border-radius: 8px;
+      border: 1px solid rgba(14,165,233,0.15);
+      width: 100%;
+      text-align: center;
+    }
+
+    /* ─── BASE URL SECTION ─── */
+    .url-section {
+      display: flex;
+      gap: 10px;
+      align-items: stretch;
+    }
+
+    .url-section input { flex: 1; }
+    .url-section .btn { flex-shrink: 0; }
+
+    /* ─── CONSOLE LOG ─── */
+    .console-log {
+      background: #03080f;
+      border: 1px solid rgba(0,229,160,0.08);
+      border-radius: 10px;
+      padding: 14px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: rgba(0,229,160,0.7);
+      max-height: 120px;
+      overflow-y: auto;
+      white-space: pre-line;
+      line-height: 1.6;
+      margin-top: 16px;
+    }
+
+    .console-log::-webkit-scrollbar { width: 4px; }
+    .console-log::-webkit-scrollbar-track { background: transparent; }
+    .console-log::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* ─── UPLOAD RESULT ─── */
+    .upload-result {
+      display: none;
+      background: rgba(0,229,160,0.06);
+      border: 1px solid rgba(0,229,160,0.2);
+      border-radius: 10px;
+      padding: 14px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--primary);
+      white-space: pre-wrap;
+      margin-top: 12px;
+    }
+
+    .error-box {
+      display: none;
+      color: var(--danger);
+      font-size: 13px;
+      padding: 12px;
+      background: rgba(255,77,109,0.08);
+      border: 1px solid rgba(255,77,109,0.2);
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+
+    /* ─── INFO NOTICE ─── */
+    .notice {
+      padding: 14px 16px;
+      border-radius: 10px;
+      background: rgba(251,191,36,0.07);
+      border: 1px solid rgba(251,191,36,0.15);
+      color: var(--warning);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .notice-icon { font-size: 16px; margin-left: 6px; }
+
+    /* ─── SECTION DIVIDER ─── */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 20px 0;
+    }
+
+    /* ─── STEP INDICATOR ─── */
+    .steps {
+      display: flex;
+      gap: 0;
+      margin-bottom: 24px;
+      background: var(--surface2);
+      border-radius: 12px;
+      padding: 4px;
+    }
+
+    .step {
+      flex: 1;
+      text-align: center;
+      padding: 10px 8px;
+      border-radius: 9px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      font-family: var(--mono);
+      transition: all 0.3s;
+      cursor: default;
+    }
+
+    .step.active {
+      background: var(--primary);
+      color: #001a10;
+    }
+
+    .step.done {
+      color: var(--primary);
+    }
+
+    /* ─── AMOUNT DISPLAY ─── */
+    .amount-display {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .amount-label { font-size: 11px; color: var(--muted); font-family: var(--mono); letter-spacing: 1px; margin-bottom: 4px; }
+    .amount-value { font-size: 32px; font-family: var(--mono); font-weight: 700; color: var(--primary); }
+    .amount-currency { font-size: 16px; color: var(--muted); }
+
+    /* ─── FOOTER ─── */
+    footer {
+      text-align: center;
+      margin-top: 32px;
+      font-size: 12px;
+      color: var(--muted);
+      font-family: var(--mono);
+      opacity: 0.6;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card { animation: fadeIn 0.4s ease forwards; }
+    .card:nth-child(2) { animation-delay: 0.1s; }
+
+    /* ─── VENDING MACHINE POLISH ─── */
+    .main-grid { grid-template-columns: 1.05fr 0.95fr; }
+    .product-card {
+      min-height: 150px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      text-align: center;
+    }
+    .product-emoji { font-size: 44px; filter: drop-shadow(0 8px 18px rgba(0,0,0,.35)); }
+    .product-name { font-size: 20px; }
+    .product-price { font-size: 16px; }
+    .qr-panel {
+      min-height: 330px;
+      background:
+        linear-gradient(180deg, rgba(0,229,160,0.06), rgba(14,165,233,0.04)),
+        var(--surface2);
+      border-color: rgba(0,229,160,0.28);
+      box-shadow: inset 0 0 30px rgba(0,229,160,0.04);
+    }
+    .amount-display {
+      box-shadow: inset 0 0 30px rgba(0,229,160,0.04);
+    }
+    .btn-primary, .btn-blue { min-height: 54px; font-size: 16px; }
+
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo-group">
+      <div class="logo-icon">🏧</div>
+      <div class="logo-text">
+        <h1>Smart Vending</h1>
+        <span>SMART VENDING TERMINAL</span>
+      </div>
+    </div>
+    <div class="status-badge">
+      <div class="status-dot"></div>
+      ONLINE
+    </div>
+  </header>
+
+  <!-- STEPS -->
+  <div class="steps">
+    <div class="step active" id="step1">01 — اختر المنتج</div>
+    <div class="step" id="step2">02 — أنشئ الطلب</div>
+    <div class="step" id="step3">03 — امسح QR وادفع</div>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="main-grid">
+
+    <!-- LEFT COLUMN -->
+    <div style="display:flex;flex-direction:column;gap:16px;">
+
+      <!-- PRODUCTS -->
+      <div class="card">
+        <div class="card-title">اختر منتجك</div>
+        <div class="products-grid">
+          <div class="product-card selected" data-value="Water|10" onclick="selectProduct(this)">
+            <span class="product-emoji">💧</span>
+            <div class="product-name">مياه</div>
+            <div class="product-price">10 EGP</div>
+          </div>
+          <div class="product-card" data-value="Pepsi|10" onclick="selectProduct(this)">
+            <span class="product-emoji">🥤</span>
+            <div class="product-name">بيبسي</div>
+            <div class="product-price">10 EGP</div>
+          </div>
+        </div>
+
+        <!-- hidden select for JS compatibility -->
+        <select id="productSelect" style="display:none">
+          <option value="Water|10">مياه — 10 جنيه</option>
+          <option value="Pepsi|10">بيبسي — 10 جنيه</option>
+        </select>
+      </div>
+
+      <!-- ORDER FORM -->
+      <div class="card">
+        <div class="card-title">بيانات الطلب</div>
+
+        <div class="field">
+          <label>رقم المشتري (يستقبل PIN)</label>
+          <input type="text" id="customerPhone" placeholder="010XXXXXXXX" value="01068264971">
+        </div>
+
+        <div class="field">
+          <label>حالة الطلب</label>
+          <div id="orderStatus" class="order-status">
+            <span>⏳</span>
+            <span>لم يتم إنشاء طلب بعد</span>
+          </div>
+        </div>
+
+        <div id="errorBox" class="error-box"></div>
+
+        <div class="btn-group">
+          <button id="openPayBtn" class="btn btn-blue" style="flex:1">
+            🔗 فتح صفحة الدفع
+          </button>
+          <button id="createBtn" class="btn btn-primary" style="flex:1">
+            ✚ إنشاء الطلب
+          </button>
+        </div>
+      </div>
+
+
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div style="display:flex;flex-direction:column;gap:16px;">
+
+      <!-- AMOUNT DISPLAY -->
+      <div class="card">
+        <div class="card-title">المبلغ المطلوب</div>
+        <div class="amount-display">
+          <div class="amount-label">TOTAL AMOUNT</div>
+          <div><span class="amount-value" id="amountDisplay">10</span> <span class="amount-currency">EGP</span></div>
+        </div>
+        <div class="notice">
+          <span class="notice-icon">💡</span>
+          بعد إنشاء الطلب سيظهر QR. امسحه بالموبايل وافتح صفحة الدفع، ثم ارفع سكرين‌شوت الدفع من الموبايل للحصول على PIN.
+        </div>
+      </div>
+
+      <!-- QR / LINK -->
+      <div class="card">
+        <div class="card-title">رابط صفحة الدفع</div>
+        <div class="qr-panel" id="qrBox">
+          <div class="qr-icon">🔗</div>
+          <div>أنشئ الطلب أولاً لظهور الرابط</div>
+          <div style="font-size:12px;margin-top:6px;opacity:0.6">يمكنك فتح الرابط من موبايلك</div>
+        </div>
+        <div id="qrLink" style="display:none" class="qr-link"></div>
+      </div>
+
+      <!-- CONSOLE -->
+      <div class="card" style="padding:16px;">
+        <div class="card-title" style="margin-bottom:10px;">Console Log</div>
+        <div class="console-log" id="consoleLog">// Ready...</div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer>Smart Vending Machine — Customer Interface v2.0</footer>
+</div>
+
+<script>
+/*
+  customer.html JS — Smart vending UI with automatic QR
+*/
+const BASE_URL = "https://molasses-squeak-catacomb.ngrok-free.dev";
+const createBtn = document.getElementById('createBtn');
+const openPayBtn = document.getElementById('openPayBtn');
+const qrBox = document.getElementById('qrBox');
+const qrLink = document.getElementById('qrLink');
+const orderStatus = document.getElementById('orderStatus');
+const consoleLog = document.getElementById('consoleLog');
+const errorBox = document.getElementById('errorBox');
+
+function getBase(){
+  return BASE_URL;
+}
+
+function toast(msg){
+  consoleLog.innerText = '[' + new Date().toLocaleTimeString() + '] ' + msg + "\n" + consoleLog.innerText;
+}
+
+let currentOrder = null;
+
+// Product selection UI
+function selectProduct(el) {
+  document.querySelectorAll('.product-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  const val = el.dataset.value;
+  document.getElementById('productSelect').value = val;
+  const amount = val.split('|')[1];
+  document.getElementById('amountDisplay').textContent = amount;
+  updateStep(1);
+}
+
+
+function updateStep(n) {
+  for (let i = 1; i <= 3; i++) {
+    const el = document.getElementById('step' + i);
+    el.classList.remove('active', 'done');
+    if (i < n) el.classList.add('done');
+    else if (i === n) el.classList.add('active');
+  }
+}
+
+createBtn.addEventListener('click', async () => {
+  errorBox.style.display='none';
+  const base = getBase();
+  const prodVal = document.getElementById('productSelect').value;
+  const [product, amount] = prodVal.split('|');
+  const phone = document.getElementById('customerPhone').value.trim();
+
+  if(!phone){ errorBox.innerText='ادخل رقم الهاتف'; errorBox.style.display='block'; return; }
+
+  try {
+    createBtn.disabled = true;
+    createBtn.textContent = '⏳ جاري الإنشاء...';
+    const res = await fetch(base + '/create_order', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ phone: phone, product: product, amount: parseFloat(amount) })
+    });
+    const j = await res.json();
+    createBtn.disabled = false;
+    createBtn.innerHTML = '✚ إنشاء الطلب';
+    if(!res.ok){ errorBox.innerText = j.error || JSON.stringify(j); errorBox.style.display='block'; return; }
+    currentOrder = j.order_id;
+    orderStatus.className = 'order-status active';
+    orderStatus.innerHTML = `<span>✅</span><span><b>Order:</b> ${currentOrder.slice(0,8)}... | <b>${amount} EGP</b> — ادفع لرقم المحفظة ثم ارفع السكرين شوت</span>`;
+    const baseUrl = getBase();
+    const payUrl = baseUrl + '/pay/' + currentOrder;
+    const qrUrl = baseUrl + '/qr/' + currentOrder;
+
+    qrBox.innerHTML = `
+      <div style="color:var(--primary);font-weight:800;margin-bottom:12px;font-size:16px;">
+        امسح QR لفتح صفحة الدفع
+      </div>
+      <div class="qr-icon">⏳</div>
+      <div>جاري تحميل QR...</div>
+    `;
+
+    try {
+      const qrRes = await fetch(qrUrl);
+      const qrBlob = await qrRes.blob();
+      const qrObjectUrl = URL.createObjectURL(qrBlob);
+
+      qrBox.innerHTML = `
+        <div style="color:var(--primary);font-weight:800;margin-bottom:12px;font-size:16px;">
+          امسح QR لفتح صفحة الدفع
+        </div>
+        <img src="${qrObjectUrl}"
+             style="width:230px;height:230px;display:block;background:white;padding:12px;border-radius:18px;object-fit:contain;box-shadow:0 0 35px rgba(0,229,160,0.25);">
+        <div style="font-size:12px;margin-top:12px;color:var(--muted);">
+          افتح بالكاميرا أو QR Scanner
+        </div>
+      `;
+    } catch (e) {
+      qrBox.innerHTML = `
+        <div style="color:var(--danger);font-weight:700;">فشل تحميل QR</div>
+        <div style="font-size:12px;margin-top:8px;color:var(--muted);">تأكد أن السيرفر شغال وأن Base URL صحيح</div>
+      `;
+    }
+
+    qrLink.textContent = payUrl;
+    qrLink.style.display = 'block';
+    updateStep(3);
+    toast('✓ Order created: ' + currentOrder);
+  } catch (err){
+    createBtn.disabled = false;
+    createBtn.innerHTML = '✚ إنشاء الطلب';
+    console.error(err);
+    errorBox.innerText = 'طلب الإنشاء فشل — تأكد تشغيل السيرفر و أن BASE_URL مضبوط.';
+    errorBox.style.display='block';
+  }
+});
+
+openPayBtn.addEventListener('click', () => {
+  if(!currentOrder){ alert('أنشئ طلب أولا'); return; }
+  const u = getBase() + '/pay/' + currentOrder;
+  window.open(u, '_blank');
+});
+
+
+
+(function init(){
+  updateStep(1);
+})();
+</script>
+</body>
+</html>
