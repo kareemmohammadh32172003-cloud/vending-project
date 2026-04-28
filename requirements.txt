@@ -1,9 +1,11 @@
 Flask
+flask-cors
+gunicorn
 mysql-connector-python
 python-dotenv
+Pillow
 pytesseract
 opencv-python
 numpy
-Pillow
-qrcode
+qrcode[pil]
 twilio
