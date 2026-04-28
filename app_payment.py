@@ -983,7 +983,7 @@ def upload_payment_web():
     
 @app.route("/qr/<order_id>", methods=["GET"])
 def generate_qr(order_id):
-    pay_url = f"https://molasses-squeak-catacomb.ngrok-free.dev/pay/{order_id}"
+    pay_url = f"https://thriving-spirit-production-f1ac.up.railway.app/pay/{order_id}"
 
     img = qrcode.make(pay_url)
 
