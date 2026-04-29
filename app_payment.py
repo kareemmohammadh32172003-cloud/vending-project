@@ -1003,6 +1003,34 @@ def ocr_test():
         })
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+@app.route("/order_status/<order_id>", methods=["GET"])
+def order_status(order_id):
+    try:
+        conn = get_conn()
+        cur = conn.cursor(dictionary=True)
+
+        cur.execute("""
+            SELECT order_id, product, amount, status
+            FROM orders
+            WHERE order_id=%s
+        """, (order_id,))
+
+        order = cur.fetchone()
+
+        cur.close()
+        conn.close()
+
+        if not order:
+            return jsonify({"error": "order_not_found"}), 404
+
+        return jsonify({
+            "status": order["status"],
+            "paid": order["status"] == "COMPLETE"
+        })
+
+    except Exception as e:
+        print("order_status error:", e)
+        return jsonify({"error": str(e)}), 500
     
 # Run
 if __name__ == "__main__":
