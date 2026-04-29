@@ -992,6 +992,17 @@ def generate_qr(order_id):
     buffer.seek(0)
 
     return send_file(buffer, mimetype="image/png")
+@app.route("/ocr_test", methods=["GET"])
+def ocr_test():
+    try:
+        version = str(pytesseract.get_tesseract_version())
+        langs = pytesseract.get_languages(config="")
+        return jsonify({
+            "tesseract_version": version,
+            "languages": langs
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
     
 # Run
 if __name__ == "__main__":
