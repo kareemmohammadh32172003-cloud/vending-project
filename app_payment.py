@@ -58,7 +58,7 @@ TW_TOKEN = os.getenv("TW_TOKEN", "") or ""
 TW_NUMBER = os.getenv("TW_NUMBER", "") or ""
 
 # If Windows and tesseract not in PATH, uncomment and adjust:
-pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+#pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
 # ----------------------------
 # App init
